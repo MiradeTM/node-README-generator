@@ -1,8 +1,8 @@
-const util = require('util')
 const fs = require('fs')
 const inquirer = require('inquirer')
+const generateMarkdown = require('./utils/generateMarkdown.js')
+const path = require('path')
 
-const writeFileAsync = util.promisify(fs.writeFile())
 
 // array of questions for user
 const questions = [{
@@ -27,22 +27,43 @@ const questions = [{
 },
 {
     type: 'input',
-    message: 'Please provide GitHub usernames of collaborators/contributors.',
+    message: 'Please provide GitHub usernames of collaborators/contributors separated by commas.',
     name: 'credit'
 },
+{
+    type: 'list',
+    message: 'What license are you using?',
+    choices: ['Apache', 'MIT', 'GPL', 'None'],
+    name: 'license'
+},
+{
+    type: 'input',
+    message: 'Provide information on how to test project.',
+    name: 'test'
+},
+{
+    type: 'input',
+    message: 'If there are questions on your project, how can you be contacted?',
+    name: 'contact'
 
+}
 
 ];
 
 // function to write README file
 function writeToFile(fileName, data) {
+   // fs.writeFile()
+   fs.writeFileSync(path.join(process.cwd(), fileName), data)
 }
 
 // function to initialize program
 function init() {
-    for (const question of questions){
-        inquirer.prompt(question)
-    }
+       inquirer.prompt(questions).then(data => {
+           console.log(data);
+            writeToFile('README.md', generateMarkdown(data))
+            
+       })
+    
 
 }
 
